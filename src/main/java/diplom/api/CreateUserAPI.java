@@ -1,5 +1,6 @@
 package diplom.api;
 
+import diplom.UserData;
 import io.qameta.allure.Step;
 import io.restassured.http.ContentType;
 import io.restassured.response.ValidatableResponse;
@@ -14,29 +15,22 @@ public class CreateUserAPI {
 
 
     @Step("Создание уникального пользователя")
-    public ValidatableResponse createUser(String email, String password, String name){
+    public ValidatableResponse createUser(UserData userData){
         return given()
                 .contentType(ContentType.JSON)
                 .baseUri(BASE_URI)
-                .body("{\n" +
-                        "   \"email\": \"" + email + "\",\n" +
-                        "   \"password\": \"" + password + "\",\n" +
-                        "    \"name\": \"" + name + "\"\n" +
-                        "}")
+                .body(userData)
                 .when()
                 .post(REGISTR_USER)
                 .then();
     }
 
     @Step("Логин юзера в системе")
-    public ValidatableResponse loginUser(String email, String password){
+    public ValidatableResponse loginUser(UserData userData){
         return given()
                 .contentType(ContentType.JSON)
                 .baseUri(BASE_URI)
-                .body("{\n" +
-                        "   \"email\": \"" + email + "\",\n" +
-                        "   \"password\": \"" + password + "\"\n" +
-                        "}")
+                .body(userData)
                 .when()
                 .post(LOGIN_USER)
                 .then();

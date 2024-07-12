@@ -1,6 +1,7 @@
 import diplom.LoginUserObject;
 
 import diplom.MainPageObject;
+import diplom.UserData;
 import diplom.api.CreateUserAPI;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import io.qameta.allure.junit4.DisplayName;
@@ -22,6 +23,7 @@ public class LoginInSystemTest extends BaseConstractTest{
     private final boolean expected = true;
     MainPageObject mainPageObject;
     CreateUserAPI createUserAPI;
+    private UserData userData;
 
     @Before
     @DisplayName("Подготовка данных и открытие формы")
@@ -33,8 +35,9 @@ public class LoginInSystemTest extends BaseConstractTest{
         driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
         mainPageObject = new MainPageObject(driver);
         mainPageObject.openMainPage();
+        userData = new UserData(name, email, password);
         createUserAPI = new CreateUserAPI();
-        createUserAPI.createUser(email, password, name);
+        createUserAPI.createUser(userData);
     }
 
     @DisplayName("Вход по кнопке Личный кабинет")
@@ -105,7 +108,7 @@ public class LoginInSystemTest extends BaseConstractTest{
     @DisplayName("Закрытие браузера и удаление юзера")
     public void deleteUserAndCloseBrowser() {
         String response = new CreateUserAPI()
-                .loginUser(email, password)
+                .loginUser(userData)
                 .extract().body()
                 .path("accessToken");
         if (response != null){

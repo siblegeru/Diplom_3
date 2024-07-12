@@ -14,7 +14,7 @@ public class GoToCategoryIngridientsTest extends BaseConstractTest{
     private CategoriesObject categoriesObject;
     private final boolean expected = true;
     MainPageObject mainPageObject;
-
+    private final static String GOOGLE_DR = "google";
     @Before
     @DisplayName("Открытие формы")
     public void setUp() {

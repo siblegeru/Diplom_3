@@ -1,5 +1,6 @@
 import diplom.MainPageObject;
 
+import diplom.UserData;
 import diplom.api.CreateUserAPI;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import io.qameta.allure.junit4.DisplayName;
@@ -23,20 +24,25 @@ public class CreateNewUserTest extends BaseConstractTest {
     private String name;
     private String password;
     private final boolean expected = true;
+    UserData userData;
 
     @Before
     @DisplayName("Подготовка данных и открытие формы")
     public void setUp() {
-        getWebDriver();
+        WebDriverManager.chromedriver().setup();
+        driver = new ChromeDriver();
+        driver.get("https://stellarburgers.nomoreparties.site/");
+
+        //driver = getWebDriver();
         email = RandomStringUtils.randomAlphabetic(10) + "@yandex.ru";
         password = RandomStringUtils.randomAlphabetic(10);
         name = RandomStringUtils.randomAlphabetic(10);
-        driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
+        userData = new UserData(name, email, password);
         mainPageObject = new MainPageObject(driver);
+        driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
         mainPageObject.openMainPage();
         mainPageObject.buttonForFormLoginOnMainPage();
-        mainPageObject.isDisplaidFormLogin();
-        mainPageObject.buttonFormRegistratedNewUser();
+
     }
 
 
@@ -44,15 +50,15 @@ public class CreateNewUserTest extends BaseConstractTest {
     @Test
     @DisplayName("Создание пользователя через UI")
     public void checkCreateUserTest() {
-        new MainPageObject(driver);
+        mainPageObject.isDisplaidFormLogin();
+        mainPageObject.buttonFormRegistratedNewUser();
         mainPageObject.registrNewUser(email, password, name);
+
     }
 
     @Test
     @DisplayName("Проверка отображения ошибки при некорректном пароле")
     public void checkCreateUserWhithSmallPasswordTest() {
-        new MainPageObject(driver);
-        mainPageObject.buttonForFormLoginOnMainPage();
         mainPageObject.buttonFormRegistratedNewUser();
         mainPageObject.registrNewUser(email, name, "wtcb");
         assertEquals(expected, mainPageObject.isDisplaidFailInputPassword());
@@ -62,7 +68,7 @@ public class CreateNewUserTest extends BaseConstractTest {
     @DisplayName("Закрытие браузера и удаление юзера")
     public void deleteUserAndCloseBrowser() {
         String response = new CreateUserAPI()
-                .loginUser(email, password)
+                .loginUser(userData)
                 .extract().body()
                 .path("accessToken");
         if (response != null){
